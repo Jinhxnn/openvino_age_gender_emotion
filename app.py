@@ -4,6 +4,7 @@ import cv2
 import numpy
 import utils
 import io
+from camera_input_live import camera_input_live
 
 def play_video(video_source):
     camera = cv2.VideoCapture(video_source)
@@ -18,7 +19,6 @@ def play_video(video_source):
         else:
             camera.release() # end video when no more footage
             break
-            
 
 st.set_page_config(
     page_title="Age/Gender/Emotion",
@@ -38,19 +38,16 @@ conf_threshold = float(st.sidebar.slider("Select the Confidence Threshold", 10, 
 input = None
 if source_radio == "IMAGE":
     st.sidebar.header("Upload")
-    input = st.sidebar.file_uploader("Choose an image.", type=("jpg","png"))
+    input = st.sidebar.file_uploader("Choose an image.", type=("jpg", "png"))
 
     if input is not None:
         uploaded_image = PIL.Image.open(input)
         uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
         visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold = conf_threshold)
-        
         st.image(visualized_image, channels = "BGR")
-
     else:
         st.image("assets/sample_image.jpg") # A default image is displayed before the input image is uploaded
         st.write("Click on 'Browse Files' in the sidebar to run inference on an image")
-        
 
 input = None
 temporary_location = None # Initialize the temporary_location variable
@@ -68,16 +65,18 @@ if source_radio == "VIDEO":
         out.close()
 
     if temporary_location is not None:
-        
         play_video(temporary_location) # When the video is uploaded, run the play_video function
-        if st.button("Replay", type="primary"):      
+        if st.button("Replay", type="primary"):
             pass # Using pass will cause the code to continue, in which case the video will play again
-
     else:
         st.video("assets/sample_video.mp4")
-        st.write("Click on 'Browse Files' in the sidebar to run inference on an video.")        
-
-    
+        st.write("Click on 'Browse Files' in the sidebar to run inference on a video.")
 
 if source_radio == "WEBCAM":
-    play_video(0)   # Create a new if function, if the video input source is 0, the computer is connected to the webcam
+    uploaded_image = camera_input_live()
+    if uploaded_image is not None:
+        uploaded_image_cv = cv2.cvtColor(numpy.array(uploaded_image), cv2.COLOR_RGB2BGR)
+        visualized_image = utils.predict_image(uploaded_image_cv, conf_threshold=conf_threshold)
+        st.image(visualized_image, channels="BGR")
+    else:
+        st.write("Failed to capture image from webcam.")
