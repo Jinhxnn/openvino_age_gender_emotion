@@ -30,12 +30,12 @@ def play_live_camera():
 
 st.set_page_config(
     page_title="Age/Gender/Emotion",
-    page_icon=":sun_with_face:",
+    page_icon=":hugging_face:",
     layout="centered",
     initial_sidebar_state="expanded",
 )
 
-st.title("Age/Gender/Emotion Project :full_moon_with_face:")
+st.title("Age/Gender/Emotion Project :hugging_face:")
 
 st.sidebar.header("Type")
 source_radio = st.sidebar.radio("Select Source", ["IMAGE", "VIDEO", "WEBCAM"])
